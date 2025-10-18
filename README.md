@@ -1,4 +1,4 @@
-# SlideRX Landing — Astro App
+# SlideRX Landing
 
 **Claude Code Hackathon Project**  
 AI-powered presentation processing system that converts long presentation PDFs into condensed **3-slide executive summaries**, orchestrated via **n8n**.
