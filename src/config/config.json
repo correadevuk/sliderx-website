@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "SlideRX",
-    "base_url": "https://SlideRX-astro.vercel.app",
+    "base_url": "https://master.d2o9vrrs9fbgj.amplifyapp.com",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/images/favicon.png",
@@ -32,7 +32,7 @@
       },
       {
         "label": "Log In",
-        "link": "https://main.d3jwqghd7z2itd.amplifyapp.com/login",
+        "link": "https://main.d3jwqghd7z2itd.amplifyapp.com",
         "fill": true
       }
     ]
