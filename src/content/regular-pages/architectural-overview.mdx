@@ -1,0 +1,93 @@
+---
+title: "Architectural Overview"
+meta_title: "Architectural Overview - SlideRX"
+description: "Learn about SlideRX's event-driven, decoupled AWS serverless architecture designed for reliability and scalability."
+header_alt: true
+draft: true
+---
+
+## System Architecture Summary
+
+This application implements a fully decoupled, event-driven architecture using AWS serverless services to process user presentations asynchronously. The system transforms uploaded PowerPoint presentations (in PDF format) into AI-generated executive summaries through a multi-stage pipeline. This design handles variable file sizes, complex AI processing and unpredictable execution times, all while maintaining immediate user responsiveness.
+
+## Core Technology Stack
+
+<CardContainer>
+  <ArchCard title="API Layer" content="Amazon API Gateway + AWS Lambda" />
+  <ArchCard title="Authentication" content="AWS Cognito" />
+  <ArchCard title="Database" content="Amazon DynamoDB" />
+  <ArchCard title="Storage" content="Amazon S3 with event notifications" />
+  <ArchCard title="Message Queue" content="Amazon SQS (Standard Queue)" />
+  <ArchCard title="Processing Orchestration" content="n8n workflows" />
+  <ArchCard
+    title="AI Processing"
+    content="Generative AI models (external service)"
+  />
+  <ArchCard title="PDF Generation" content="External PDF rendering service" />
+  <ArchCard title="UI" content="React" />
+</CardContainer>
+
+## Detailed Processing Flow
+
+### Phase 1: Project Initialization & File Upload
+
+Users authenticate via Cognito and create a project. A Lambda function saves initial metadata to DynamoDB and generates a pre-signed S3 URL for the client to upload the presentation directly, bypassing API Gateway's payload limits.
+
+### Phase 2: Asynchronous Document Analysis
+
+An S3 `ObjectCreated` event triggers a message to an SQS queue. A Lambda consumer polls this queue, retrieves the message, and invokes an n8n workflow. This workflow analyzes the presentation with a generative AI, generates contextual questions for the user, and updates the project status in DynamoDB to `needs_review`.
+
+### Phase 3: User Interaction & Final Generation
+
+The user answers the AI-generated questions in the UI. This triggers a second n8n workflow that synthesizes all information, generates a final 3-slide executive summary via AI, creates a presentation-quality PDF, and uploads it to an S3 output folder. A final SQS message-lambda sequence updates DynamoDB with the `COMPLETED` status and a pre-signed download URL for the user.
+
+## Key Design Patterns
+
+<CardContainer>
+  <ArchCard
+    title="Pre-Signed URLs for Direct S3 Access"
+    content="Eliminates Lambda/API Gateway as bottlenecks for large file transfers."
+  />
+  <ArchCard
+    title="Status-Driven State Machine"
+    content="A status field in DynamoDB orchestrates the UI and backend workflows (e.g., PENDING_UPLOAD → ANALYZING → COMPLETED)."
+  />
+  <ArchCard
+    title="SQS as Workflow Glue"
+    content="Decouples event producers (S3) from consumers (Lambda), enabling backpressure handling and independent scaling."
+  />
+  <ArchCard
+    title="Checkpoint-Based Processing"
+    content="DynamoDB stores intermediate results, allowing the system to resume on failure without reprocessing from the start."
+  />
+</CardContainer>
+
+## Why a Decoupled Architecture?
+
+This event-driven, decoupled approach solves several key production challenges that a monolithic or synchronous system would face.
+
+**Variable File Sizes & AI Runtimes:** S3 pre-signed URLs and SQS queues prevent API Gateway (29s) and Lambda (15min) timeouts. The user gets an immediate response.
+
+**Fault Tolerance & Retries:** SQS Dead Letter Queues (DLQs) and checkpointing in DynamoDB allow individual stages to fail and retry without affecting the entire system or losing progress.
+
+**Scalability & Cost-Efficiency:** The serverless components (Lambda, SQS) scale automatically with demand and scale to zero, ensuring we only pay for what we use.
+
+**Throughput Management:** SQS acts as a buffer during traffic spikes, ensuring the processing pipeline is not overwhelmed and requests are handled gracefully.
+
+## Trade-offs vs. Out-of-the-Box Solutions
+
+### Why not Supabase/Firebase?
+
+- **Limited control** over execution timeouts and retry logic
+- **Higher fixed costs** for always-on infrastructure
+- **Less flexibility** in workflow orchestration (e.g., conditional AI model selection)
+- Our architecture supports future enhancements (batch processing, multi-model AI routing) without platform migrations
+
+**Complexity cost:** Requires managing multiple AWS services, SQS tuning, and DynamoDB indexing strategies—acceptable trade-off for production-grade reliability.
+
+## Architecture Diagram
+
+<Images
+  image="/images/SlideRX-ArchitectureDiagram.png"
+  alt="SlideRX System Architecture Diagram showing event-driven flow"
+/>

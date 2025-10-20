@@ -33,6 +33,7 @@ export default defineConfig({
         "@/shortcodes/Figure",
         "@/shortcodes/CardContainer",
         "@/shortcodes/Card",
+        "@/shortcodes/ArchCard",
         "@/shortcodes/AccordionWrapper",
         "@/shortcodes/Images",
         "@/shortcodes/PricingWrapper",

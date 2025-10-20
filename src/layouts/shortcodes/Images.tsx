@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Controlled as ControlledZoom } from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 
-const Images = ({ image }: { image: string }) => {
+const Images = ({ image, alt }: { image: string; alt?: string }) => {
   const [isZoomed, setIsZoomed] = useState(false);
 
   const handleZoomChange = useCallback(
@@ -15,10 +15,10 @@ const Images = ({ image }: { image: string }) => {
   return (
     <ControlledZoom isZoomed={isZoomed} onZoomChange={handleZoomChange}>
       <img
-        alt="That wanaka tree, alone in the water near mountains"
+        alt={alt || "Image"}
         src={image}
-        className="cursor-pointer rounded-lg"
-        width="640"
+        className="cursor-pointer rounded-xl sm:rounded-2xl w-full"
+        style={{ maxWidth: "100%", height: "auto" }}
       />
     </ControlledZoom>
   );

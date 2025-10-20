@@ -23,7 +23,7 @@ faq:
   subtitle: "Your questions, answered 💬"
   content: "Discover how SlideRx works, what makes it different, and how it helps you deliver exactly the insights your audience needs, fast, focused and executive-ready."
   button:
-    enable: true
+    enable: false
     label: "View All FAQ"
     link: "faq"
 header_alt: true
