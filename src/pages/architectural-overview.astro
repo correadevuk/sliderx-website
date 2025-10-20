@@ -126,7 +126,7 @@ const description =
                 and invokes an n8n workflow. This workflow analyzes the presentation
                 with a generative AI, generates contextual questions for the user,
                 and updates the project status in DynamoDB to <code
-                  >needs_review</code
+                  >NEEDS_REVIEW</code
                 >.
               </p>
 
@@ -208,24 +208,45 @@ const description =
               <h3>Why not Supabase/Firebase?</h3>
               <ul>
                 <li>
-                  <strong>Limited control</strong> over execution timeouts and retry
-                  logic
+                  <strong>Abstraction layer limits control</strong> Forced to interact
+                  through proprietary APIs rather than directly with raw AWS services,
+                  restricting fine-grained configuration of timeouts, retry logic,
+                  user permissions and resources settings/permissions.
                 </li>
                 <li>
-                  <strong>Higher fixed costs</strong> for always-on infrastructure
+                  <strong>Higher fixed costs</strong> for always-on infrastructure.
                 </li>
                 <li>
-                  <strong>Less flexibility</strong> in workflow orchestration (e.g.,
-                  conditional AI model selection)
+                  <strong>Cost markup on underlying infrastructure</strong> Third-party
+                  platforms provision cloud resources (AWS, Azure, GCP) in their
+                  own accounts and add margins on top of the actual cloud provider
+                  costs.
+                </li>
+                <li>
+                  <strong>Vendor lock-in</strong> Proprietary APIs and data models
+                  make migration costly vs. AWS's open standards.
+                </li>
+                <li>
+                  <strong>Shared multi-tenant security model</strong> Less control
+                  over network isolation, encryption boundaries and resource-level
+                  permissions compared to direct AWS IAM policies.
+                </li>
+                <li>
+                  <strong>Limited scalability paths</strong> Locked into platform's
+                  database offerings. In AWS, we can migrate between database services
+                  (RDS, Aurora Serverless, DynamoDB, DocumentDB) as data volume and
+                  access patterns evolve, without vendor lock-in or major application
+                  rewrites.
                 </li>
               </ul>
               <p>
                 Our architecture supports future enhancements (batch processing,
-                multi-model AI routing) without platform migrations.
+                multi-model AI routing, custom workflow orchestration via n8n)
+                without platform migrations or vendor constraints.
               </p>
               <p>
                 <strong>Complexity cost:</strong> Requires managing multiple AWS
-                services, SQS tuning, and DynamoDB indexing strategies—acceptable
+                services, SQS tuning and DynamoDB indexing strategies, an acceptable
                 trade-off for production-grade reliability.
               </p>
             </div>
